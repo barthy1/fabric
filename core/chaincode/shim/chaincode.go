@@ -111,6 +111,7 @@ func newPeerClientConnection() (*grpc.ClientConn, error) {
 	var opts []grpc.DialOption
 	if viper.GetBool("peer.tls.enabled") {
 		var sn string
+		chaincodeLogger.Debug("Yes, TLS is enabled")
 		if viper.GetString("peer.tls.serverhostoverride") != "" {
 			sn = viper.GetString("peer.tls.serverhostoverride")
 		}
@@ -125,10 +126,11 @@ func newPeerClientConnection() (*grpc.ClientConn, error) {
 			creds = credentials.NewClientTLSFromCert(nil, sn)
 		}
 		opts = append(opts, grpc.WithTransportCredentials(creds))
+	} else {
+		opts = append(opts, grpc.WithInsecure())
 	}
 	opts = append(opts, grpc.WithTimeout(1*time.Second))
 	opts = append(opts, grpc.WithBlock())
-	opts = append(opts, grpc.WithInsecure())
 	conn, err := grpc.Dial(getPeerAddress(), opts...)
 	if err != nil {
 		return nil, err
