@@ -86,6 +86,7 @@ const (
 	ChaincodeMessage_RANGE_QUERY_STATE       ChaincodeMessage_Type = 17
 	ChaincodeMessage_RANGE_QUERY_STATE_NEXT  ChaincodeMessage_Type = 18
 	ChaincodeMessage_RANGE_QUERY_STATE_CLOSE ChaincodeMessage_Type = 19
+	ChaincodeMessage_KEEPALIVE               ChaincodeMessage_Type = 20
 )
 
 var ChaincodeMessage_Type_name = map[int32]string{
@@ -109,6 +110,7 @@ var ChaincodeMessage_Type_name = map[int32]string{
 	17: "RANGE_QUERY_STATE",
 	18: "RANGE_QUERY_STATE_NEXT",
 	19: "RANGE_QUERY_STATE_CLOSE",
+	20: "KEEPALIVE",
 }
 var ChaincodeMessage_Type_value = map[string]int32{
 	"UNDEFINED":               0,
@@ -131,6 +133,7 @@ var ChaincodeMessage_Type_value = map[string]int32{
 	"RANGE_QUERY_STATE":       17,
 	"RANGE_QUERY_STATE_NEXT":  18,
 	"RANGE_QUERY_STATE_CLOSE": 19,
+	"KEEPALIVE":               20,
 }
 
 func (x ChaincodeMessage_Type) String() string {

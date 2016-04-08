@@ -164,6 +164,24 @@ func chatWithPeer(chaincodeSupportClient pb.ChaincodeSupportClient, cc Chaincode
 	// Register on the stream
 	chaincodeLogger.Debug("Registering.. sending %s", pb.ChaincodeMessage_REGISTER)
 	handler.serialSend(&pb.ChaincodeMessage{Type: pb.ChaincodeMessage_REGISTER, Payload: payload})
+	
+	duration, err1 := time.ParseDuration(viper.GetString("chaincode.keepalive"))
+	if err1 != nil {
+		duration = 30*time.Second
+	}
+	chaincodeLogger.Debug("Chaincode Keepalive Time is %s", viper.GetString("chaincode.keepalive"))
+	
+	go func() {
+		for {
+			time.Sleep(duration)
+			err := handler.serialSend(&pb.ChaincodeMessage{Type: pb.ChaincodeMessage_KEEPALIVE})
+			if err != nil {
+				fmt.Errorf("Error sending keepalive, err=%s", err)
+				return
+			}
+		}
+	}()
+	
 	waitc := make(chan struct{})
 	go func() {
 		defer close(waitc)

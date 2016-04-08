@@ -243,6 +243,7 @@ func (chaincodeSupport *ChaincodeSupport) getArgsAndEnv(cID *pb.ChaincodeID) (ar
 	envs = []string{"CORE_CHAINCODE_ID_NAME=" + cID.Name}
 	envs = append(envs, "CORE_PEER_TLS_CERT_FILE=" + viper.GetString("peer.tls.cert.file"))
 	envs = append(envs, "CORE_PEER_TLS_KEY_FILE=" + viper.GetString("peer.tls.key.file"))
+	envs = append(envs, "CORE_CHAINCODE_KEEPALIVE=" + viper.GetString("chaincode.keepalive"))
 	if viper.GetBool("peer.tls.enabled") {
 		envs = append(envs, "OPENCHAIN_PEER_TLS_ENABLED=true") 
 	}

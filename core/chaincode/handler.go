@@ -1317,6 +1317,12 @@ func (handler *Handler) HandleMessage(msg *pb.ChaincodeMessage) error {
 		chaincodeLogger.Debug("[%s]HandleMessage- Received request to query another chaincode", msg.Uuid)
 		handler.handleQueryChaincode(msg)
 		return nil
+	} else if msg.Type == pb.ChaincodeMessage_KEEPALIVE {
+		// Received a keep alive message, so let's ignore it
+		chaincodeLogger.Debug("[%s]HandleMessage- Received keepalive message", msg.Uuid)
+		serialSendMsg := &pb.ChaincodeMessage{Type: pb.ChaincodeMessage_KEEPALIVE}
+		handler.serialSend(serialSendMsg)
+		return nil
 	}
 	if handler.FSM.Cannot(msg.Type.String()) {
 		// Check if this is a request from validator in query context
