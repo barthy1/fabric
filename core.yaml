@@ -280,7 +280,7 @@ chaincode:
         # This is the basis for the Golang Dockerfile.  Additional commands will
         # be appended depedendent upon the chaincode specification.
         Dockerfile:  |
-            from openblockchain/baseimage
+            from golang:1.6
             COPY src $GOPATH/src
             WORKDIR $GOPATH
 
