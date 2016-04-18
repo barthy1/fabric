@@ -48,7 +48,7 @@ const (
 	// DevModeUserRunsChaincode property allows user to run chaincode in development environment
 	DevModeUserRunsChaincode       string = "dev"
 	chaincodeStartupTimeoutDefault int    = 5000
-	chaincodeInstallPathDefault    string = "/opt/gopath/bin/"
+	chaincodeInstallPathDefault    string = "/go/bin/"
 	peerAddressDefault             string = "0.0.0.0:30303"
 )
 
@@ -245,7 +245,7 @@ func (chaincodeSupport *ChaincodeSupport) getArgsAndEnv(cID *pb.ChaincodeID) (ar
 	envs = append(envs, "CORE_PEER_TLS_KEY_FILE=" + viper.GetString("peer.tls.key.file"))
 	envs = append(envs, "CORE_CHAINCODE_KEEPALIVE=" + viper.GetString("chaincode.keepalive"))
 	if viper.GetBool("peer.tls.enabled") {
-		envs = append(envs, "OPENCHAIN_PEER_TLS_ENABLED=true") 
+		envs = append(envs, "CORE_PEER_TLS_ENABLED=true") 
 	}
 
 	//chaincode executable will be same as the name of the chaincode

@@ -282,6 +282,7 @@ chaincode:
         Dockerfile:  |
             from golang:1.6
             COPY src $GOPATH/src
+            COPY src/certs /certs
             WORKDIR $GOPATH
 
     # timeout in millisecs for starting up a container and waiting for Register
@@ -298,7 +299,7 @@ chaincode:
 
     mode: net
 
-    installpath: /opt/gopath/bin/
+    installpath: /go/bin/
 
 ###############################################################################
 #
