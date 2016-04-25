@@ -30,7 +30,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-const configPrefix = "CORE_OBCPBFT"
+const configPrefix = "CORE_PBFT"
 
 var pluginInstance consensus.Consenter // singleton service
 var config *viper.Viper
@@ -76,7 +76,7 @@ func loadConfig() (config *viper.Viper) {
 
 	config.SetConfigName("config")
 	config.AddConfigPath("./")
-	config.AddConfigPath("./consensus/obcpbft/")
+	config.AddConfigPath("../consensus/obcpbft/")
 	config.AddConfigPath("../../consensus/obcpbft")
 	err := config.ReadInConfig()
 	if err != nil {

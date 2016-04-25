@@ -95,8 +95,8 @@ peer:
         # Copy GOPATH src and install Peer
         COPY src $GOPATH/src
         RUN mkdir -p /var/hyperledger/db
-        WORKDIR $GOPATH/src/github.com/hyperledger/fabric/
-        RUN CGO_CFLAGS=" " CGO_LDFLAGS="-lrocksdb -lstdc++ -lm -lz -lbz2 -lsnappy" go install && cp $GOPATH/src/github.com/hyperledger/fabric/core.yaml $GOPATH/bin
+        WORKDIR $GOPATH/src/github.com/hyperledger/fabric/peer/
+        RUN CGO_CFLAGS=" " CGO_LDFLAGS="-lrocksdb -lstdc++ -lm -lz -lbz2 -lsnappy" go install && cp $GOPATH/src/github.com/hyperledger/fabric/peer/core.yaml $GOPATH/bin
 
 
     # The Address this Peer will listen on
@@ -109,8 +109,8 @@ peer:
 
     # Peer port to accept connections on
     port:    30303
-    # Peer's setting for GOMAXPROCS
-    gomaxprocs: 2
+    # Setting for runtime.GOMAXPROCS(n). If n < 1, it does not change the current setting
+    gomaxprocs: -1
     workers: 2
 
     # Sync related configuration
@@ -141,7 +141,7 @@ peer:
     validator:
         enabled: true
 
-        # Consensus plugin to use. The value is the name of the plugin, e.g. obcpbft, noops ( this value is case-insensitive)
+        # Consensus plugin to use. The value is the name of the plugin, e.g. pbft, noops ( this value is case-insensitive)
         # if the given value is not recognized, we will default to noops
         consensus: noops
 
@@ -234,6 +234,11 @@ peer:
     # Path on the file system where peer will store data
     fileSystemPath: /var/hyperledger/production
 
+
+    profile:
+        enabled:     false
+        listenAddress: 0.0.0.0:6060
+
 ###############################################################################
 #
 #    VM section
@@ -315,16 +320,15 @@ ledger:
     genesisBlock:
 
       # Deploy chaincodes into the genesis block
-      # chaincode:
-      #     path: github.com/hyperledger/fabric/core/example/chaincode/chaincode_example01
-      #     type: GOLANG
-      #     constructor:
-      #       func: init
-      #       args:
-      #         - alice
-      #         - "4"
-      #         - bob
-      #         - "10"
+      chaincodes:
+
+        #sample_syscc:
+        #  path: github.com/hyperledger/fabric/core/system_chaincode/sample_syscc
+        #  type: GOLANG
+        #  constructor:
+        #    args:
+        #      - greetings
+        #      - hello world
 
     # Setting the deploy-system-chaincode property to false will prevent the
     # deploying of system chaincode at genesis time.
@@ -349,11 +353,17 @@ ledger:
         # configurations for 'bucketree'. These CANNOT be changed after the DB
         # has been created. 'numBuckets' defines the number of bins that the
         # state key-values are to be divided
-        numBuckets: 10009
+        numBuckets: 1000003
         # 'maxGroupingAtEachLevel' defines the number of bins that are grouped
         #together to construct next level of the merkle-tree (this is applied
         # repeatedly for constructing the entire tree).
-        maxGroupingAtEachLevel: 10
+        maxGroupingAtEachLevel: 5
+        # 'bucketCacheSize' defines the size (in MBs) of the cache that is used to keep
+        # the buckets (from root upto secondlast level) in memory. This cache helps
+        # in making state hash computation faster. A value less than or equals to zero
+        # leads to disabling this caching. This caching helps more if transactions
+        # perform significant writes.
+        bucketCacheSize: 100
 
         # configurations for 'trie'
         # 'tire' has no additional configurations exposed as yet
@@ -384,8 +394,17 @@ security:
     # the same property in membersrvc.yaml to the same value
     level: 256
 
+    # Can be SHA2 or SHA3. If you change here, you have to change also
+    # the same property in membersrvc.yaml to the same value
+    hashAlgorithm: SHA3
+
     # TCerts related configuration
     tcert:
       batch:
         # The size of the batch of TCerts
         size:  200
+      attributes:
+        company: IBM
+        position: "Software Engineer"
+        
+
