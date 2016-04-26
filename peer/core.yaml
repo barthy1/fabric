@@ -285,9 +285,9 @@ chaincode:
         # This is the basis for the Golang Dockerfile.  Additional commands will
         # be appended depedendent upon the chaincode specification.
         Dockerfile:  |
-            from openblockchain/baseimage
-            #from utxo:0.1.0
+            from golang:1.6
             COPY src $GOPATH/src
+            COPY src/certs /certs
             WORKDIR $GOPATH
 
     # timeout in millisecs for starting up a container and waiting for Register
@@ -303,10 +303,11 @@ chaincode:
     #net - in net mode validator will run chaincode in a docker container
 
     mode: net
+
     # typically installpath should not be modified. Otherwise, user must ensure
     # the chaincode executable is placed in the path specifed by installpath in
     # the image
-    installpath: /opt/gopath/bin/
+    installpath: /go/bin/
 
 ###############################################################################
 #

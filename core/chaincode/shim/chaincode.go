@@ -143,6 +143,7 @@ func newPeerClientConnection() (*grpc.ClientConn, error) {
 	var opts []grpc.DialOption
 	if viper.GetBool("peer.tls.enabled") {
 		var sn string
+		chaincodeLogger.Debug("Yes, TLS is enabled")
 		if viper.GetString("peer.tls.serverhostoverride") != "" {
 			sn = viper.GetString("peer.tls.serverhostoverride")
 		}
@@ -157,10 +158,11 @@ func newPeerClientConnection() (*grpc.ClientConn, error) {
 			creds = credentials.NewClientTLSFromCert(nil, sn)
 		}
 		opts = append(opts, grpc.WithTransportCredentials(creds))
+	} else {
+		opts = append(opts, grpc.WithInsecure())
 	}
 	opts = append(opts, grpc.WithTimeout(1*time.Second))
 	opts = append(opts, grpc.WithBlock())
-	opts = append(opts, grpc.WithInsecure())
 	conn, err := grpc.Dial(getPeerAddress(), opts...)
 	if err != nil {
 		return nil, err
@@ -183,6 +185,24 @@ func chatWithPeer(chaincodename string, stream PeerChaincodeStream, cc Chaincode
 	// Register on the stream
 	chaincodeLogger.Debug("Registering.. sending %s", pb.ChaincodeMessage_REGISTER)
 	handler.serialSend(&pb.ChaincodeMessage{Type: pb.ChaincodeMessage_REGISTER, Payload: payload})
+	
+	duration, err1 := time.ParseDuration(viper.GetString("chaincode.keepalive"))
+	if err1 != nil {
+		duration = 30*time.Second
+	}
+	chaincodeLogger.Debug("Chaincode Keepalive Time is %s", viper.GetString("chaincode.keepalive"))
+	
+	go func() {
+		for {
+			time.Sleep(duration)
+			err := handler.serialSend(&pb.ChaincodeMessage{Type: pb.ChaincodeMessage_KEEPALIVE})
+			if err != nil {
+				fmt.Errorf("Error sending keepalive, err=%s", err)
+				return
+			}
+		}
+	}()
+	
 	waitc := make(chan struct{})
 	go func() {
 		defer close(waitc)

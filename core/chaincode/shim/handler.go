@@ -167,6 +167,11 @@ func newChaincodeHandler(peerChatStream PeerChaincodeStream, chaincode Chaincode
 			{Name: pb.ChaincodeMessage_QUERY.String(), Src: []string{"transaction"}, Dst: "transaction"},
 			{Name: pb.ChaincodeMessage_QUERY.String(), Src: []string{"ready"}, Dst: "ready"},
 			{Name: pb.ChaincodeMessage_RESPONSE.String(), Src: []string{"ready"}, Dst: "ready"},
+			{Name: pb.ChaincodeMessage_KEEPALIVE.String(), Src: []string{"created"}, Dst: "created"},
+			{Name: pb.ChaincodeMessage_KEEPALIVE.String(), Src: []string{"established"}, Dst: "established"},
+			{Name: pb.ChaincodeMessage_KEEPALIVE.String(), Src: []string{"init"}, Dst: "init"},
+			{Name: pb.ChaincodeMessage_KEEPALIVE.String(), Src: []string{"ready"}, Dst: "ready"},
+			{Name: pb.ChaincodeMessage_KEEPALIVE.String(), Src: []string{"transaction"}, Dst: "transaction"},
 		},
 		fsm.Callbacks{
 			"before_" + pb.ChaincodeMessage_REGISTERED.String(): func(e *fsm.Event) { v.beforeRegistered(e) },
