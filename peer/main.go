@@ -702,7 +702,7 @@ func registerChaincodeSupport(chainname chaincode.ChainName, grpcServer *grpc.Se
 		fmt.Printf("could not retrive timeout var...setting to 5secs\n")
 		tOut = 5000
 	}
-	ccStartupTimeout := time.Duration(tOut) * time.Millisecond
+	ccStartupTimeout := time.Duration(tOut)
 
 	pb.RegisterChaincodeSupportServer(grpcServer, chaincode.NewChaincodeSupport(chainname, peer.GetPeerEndpoint, userRunsCC, ccStartupTimeout, secHelper))
 }
