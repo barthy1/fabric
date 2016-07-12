@@ -54,6 +54,14 @@ func init() {
 	hostConfig.Privileged = false
 
 	dockerLogger.Debug("Load docker HostConfig: %+v", hostConfig)
+
+	// Override the host config if an additional network is specified
+	networkEnabled := viper.GetBool("vm.docker.network.enabled")
+	if networkEnabled {
+		dockerLogger.Debug("Docker network enabled")
+		hostConfig = new(docker.HostConfig)
+	}
+
 }
 
 func (vm *DockerVM) createContainer(ctxt context.Context, client *docker.Client, imageID string, containerID string, args []string, env []string, attachstdin bool, attachstdout bool) error {
@@ -144,6 +152,20 @@ func (vm *DockerVM) Start(ctxt context.Context, ccid ccintf.CCID, args []string,
 			dockerLogger.Errorf("start-could not recreate container %s", err)
 			return err
 		}
+	}
+
+	// Connect to overlay network
+	networkEnabled := viper.GetBool("vm.docker.network.enabled")
+	if networkEnabled {
+		dockerLogger.Debug("Connecting container to network")
+		networkName := viper.GetString("vm.docker.network.name")
+		opts := docker.NetworkConnectionOptions{Container: containerID}
+		err = client.ConnectNetwork(networkName, opts)
+		if err != nil {
+			dockerLogger.Error(fmt.Sprintf("start-could not connect container to the network %s, %s", networkName, err))
+			return err
+		}
+		dockerLogger.Debug("Container connected to the network %s", networkName)
 	}
 
 	err = client.StartContainer(containerID, hostConfig)

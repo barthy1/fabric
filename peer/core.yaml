@@ -261,6 +261,12 @@ vm:
             NetworkMode: host
             Dns:
                # - 192.168.0.1
+        # If you would like the docker container to use the default networking settings on the docker host, but would like to
+        # connect the container to an additional network once it is created, then use this option to override the host configuration
+        # above.
+        network:
+            enabled: true # Set to true to override the host config
+            name: dev.blockchain.ibm.com # The name of the overlay network to connect to
             
 ###############################################################################
 #
